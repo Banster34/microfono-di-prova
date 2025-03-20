@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registratore Audio</title>
+</head>
+<body>
+    <h1>Registratore Audio Prova Doppiaggio </h1>
+    <button id="recordBtn">Inizia Registrazione</button>
+    <a id="downloadLink" style="display:none">Scarica Audio</a>
+<br>
+    <a href="https://sites.google.com/view/mondubnerd/prova" target="_blank">Torna alla prova</a>
+    <script>
+        let recorder, stream;
+        document.getElementById("recordBtn").addEventListener("click", async function () {
+            if (!recorder) {
+                stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                recorder = new MediaRecorder(stream);
+                let chunks = [];
+
+                recorder.ondataavailable = e => chunks.push(e.data);
+                recorder.onstop = () => {
+                    let blob = new Blob(chunks, { type: "audio/webm" });
+                    let url = URL.createObjectURL(blob);
+                    let link = document.getElementById("downloadLink");
+                    link.href = url;
+                    link.download = "audio.webm";
+                    link.style.display = "block";
+                    link.textContent = "Scarica Audio Prova";
+                };
+
+                recorder.start();
+                this.textContent = "Ferma la Registrazione";
+            } else {
+                recorder.stop();
+                stream.getTracks().forEach(track => track.stop());
+                recorder = null;
+                this.textContent = "Inizia la Registrazione";
+            }
+        });
+    </script>
+</body>
+</html>
